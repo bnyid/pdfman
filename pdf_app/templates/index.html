@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>세부특강 인쇄 자동화</title>
+    <style>
+        /* 왼쪽 여백 추가 */
+        body {
+            margin-left: 100px;
+        }
+        /* 가로 스크롤 관련 스타일 */
+        table {
+            white-space: nowrap;
+            overflow-x: auto;
+            display: block;
+            width: max-content;
+        }
+        /* 글자 크기 */
+        label {
+            font-size: 16px;
+        }
+        /* 상하 마진 */
+        div {
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+        /* 입력창과 버튼 위치 */
+        .input-container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+        }
+        .input-container input {
+            width: 30%;
+            height : 30px;
+            margin-right: 20px;
+        }
+        .input-container button {
+            width: 100px;  /* 버튼의 가로 크기 */
+            height: 35px;  /* 버튼의 세로 크기 */
+        }
+    </style>
+</head>
+<body>
+    <h1>세부특강 인쇄 자동화 앱</h1>
+    <div class="input-container">
+        <input type="text" name="cover_text" placeholder="여기에 입력하세요.">  <!-- name 속성 추가 -->
+        <button type="button" id="createButton">생성하기</button>
+    </div>
+    <form id="pdfForm">
+        {% csrf_token %}
+        <table border="1">
+            <tr>
+                {% for pdf_group in all_pdf_files %}
+                    <th>{{ pdf_group.title }}</th>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for pdf_group in all_pdf_files %}
+                    <td>
+                        {% for pdf in pdf_group.pdf_files %}
+                            <div>
+                                <input type="checkbox" id="{{ pdf_group.dir }}__{{ pdf }}" name="pdf_files" value="{{ pdf_group.dir }}__{{ pdf }}">
+                                <label for="{{ pdf }}">{{ pdf }}</label>
+                            </div>
+                        {% endfor %}
+                    </td>
+                {% endfor %}
+            </tr>
+        </table>
+    </form>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('pdfForm');
+            const createButton = document.getElementById('createButton');  // 생성하기 버튼
+            const coverText = document.querySelector('input[name="cover_text"]');  // 텍스트 입력창
+            
+            createButton.addEventListener('click', function() {  // 생성하기 버튼 클릭 이벤트
+                const formData = new FormData(form);
+                formData.append('cover_text', coverText.value);  // 텍스트 입력값을 폼 데이터에 추가
+                const csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    
+                fetch('/merge-pdf/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: formData
+                }).then(response => response.json())
+                .then(data => {
+                    if (data.pdf_url) {
+                        window.open(data.pdf_url, '_blank');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
