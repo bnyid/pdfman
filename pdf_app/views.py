@@ -1,13 +1,22 @@
 # 기존의 views.py 코드를 수정하여 상대 경로를 설정
 
+
+
+# 설치해야할 프레임 워크 = pip install django
 from django.shortcuts import render
 from django.http import JsonResponse, FileResponse
 from django.urls import reverse  # reverse 추가
+
+# 설치할 패키지 : pip install reportlab   << canvas, letter, pdfmetrics, TTfont 라이브러리가 포함되어 있음
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
-from PyPDF2 import PdfReader, PdfWriter  # PdfFileReader와 PdfFileWriter 대신 이를 사용
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+
+
+# 설치할 라이브러리2 : pip install PyPDF2 << PdfReader, PdfWriter 라이브러리가 포함되어 있음.
+from PyPDF2 import PdfReader, PdfWriter  # PdfFileReader와 PdfFileWriter 대신 이를 사용
+
 
 import os
 import PyPDF2
