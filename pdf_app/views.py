@@ -79,7 +79,7 @@ def add_text_to_pdf(pdf_path, text):
 
     # 텍스트를 상단 중앙에 배치하기 위한 x, y 좌표를 계산합니다.
     x = (page_width - text_width) / 2
-    y = page_height - 8  # 페이지 높이에서 50 포인트를 뺀 위치에 텍스트를 배치
+    y = page_height - 10  # 페이지 높이에서 50 포인트를 뺀 위치에 텍스트를 배치
 
     c.drawString(x, y, text)
     c.save()
