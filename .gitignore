@@ -1,2 +1,4 @@
 pdf_app/merged.pdf
+*.pyc
+
 
