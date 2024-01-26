@@ -66,37 +66,58 @@ registerFont() = 새로운 폰트를 ReportLab의 폰트 시스템에 등록함 
 # 상대경로에서 각 폴더로 접근하기 위해 폴더의 이름을 리스트[] 로 할당함     
 # 리스트(list)와 배열(array)은 같은말임
 
-dirs = ["preview", "preview_test", "preview_test_solution", "lesson", "review_test", "review_test_solution", "bsr_test", "bsr_test_solution"]
+first_section_dirs_names = ["1_01_preview", "1_02_preview_test", "1_03_preview_test_solution", "1_04_lesson", "1_05_review_test", "1_06_review_test_solution", "1_07_bsr_test", "1_08_bsr_test_solution"]
+second_section_dirs_names = ["2_01_spartan", "2_02_advanced_lecture", "2_03_third_class", "2_04_fourth_class"]
 
 # 각 폴더 이름(키=key) 에 제목열에 들어갈 텍스트(값:value)를 딕셔너리로 선언함
 dir_titles = {             
-    "preview": "Preview",
-    "preview_test": "PT",
-    "preview_test_solution": "PT 답안",
-    "lesson": "진도교재",
-    "review_test": "RT",
-    "review_test_solution": "RT 답안",
-    "bsr_test": "BSR",
-    "bsr_test_solution": "BSR 답안",
+    "1_01_preview": "Preview",
+    "1_02_preview_test": "PT",
+    "1_03_preview_test_solution": "PT 답안",
+    "1_04_lesson": "진도교재",
+    "1_05_review_test": "RT",
+    "1_06_review_test_solution": "RT 답안",
+    "1_07_bsr_test": "BSR",
+    "1_08_bsr_test_solution": "BSR 답안",
+
+    "2_01_spartan" : "스파르탄",
+    "2_02_advanced_lecture" : "중급 특강",
+    "2_03_third_class" : "3" ,
+    "2_04_fourth_class" : "4",
 }
 
 
 
 def index(request):           #index라는 함수는, 요청(request)을 받으면,
-    all_pdf_files = []        # all_pdf_files 라는 변수를 리스트로 선언하고
-    for d in dirs:        # 폴더이름을 순차적으로 불러와서
+    
+    first_section_pdf_files = []        # first_section_pdf_files 라는 변수를 리스트로 선언하고
+    for d in first_section_dirs_names:        # 폴더이름을 순차적으로 불러와서
         pdf_dir = os.path.join(current_dir, d) # 경로 + 폴더이름을 합쳐서 정확한 폴더경로를 변수에 저장
         pdf_files = get_pdf_list(pdf_dir)      # 그 정확한 폴더에 있는 pdf들을 리스트로 만들어서 pdf_files 변수에 저장
-        all_pdf_files.append({                 # all_pdf_files 리스트에 (1)열제목 (2)PDF폴더 이름 (3)그 폴더안의 파일들을 {딕셔너리}로 append함. -> 키 : 값의 형태로 저장함
+        first_section_pdf_files.append({                 # first_section_pdf_files 리스트에 (1)열제목 (2)PDF폴더 이름 (3)그 폴더안의 파일들을 {딕셔너리}로 append함. -> 키 : 값의 형태로 저장함
             'title': dir_titles[d],            # (1) tilte키에는 각 폴더별로 dir_titles에 저장해놨던 값이 오게끔
             'dir': d,                          # (2) 폴더이름 키값 저장
             'pdf_files': pdf_files             # (3) 각 PDF 파일 리스트 할당
         })
 
-    return render(request,                         # 요청을 받으면
-                'index.html',                      # index.html에서
-                {'all_pdf_files': all_pdf_files}   # all_pdf_files(=전자)변수를 요청하면 : 그 값으로 방금 내가 위에서 만든 리스트인 all_pdf_files를 할당해줘
-                )
+
+    second_section_pdf_files = []
+    for d in second_section_dirs_names:
+        pdf_dir = os.path.join(current_dir, d)
+        pdf_files = get_pdf_list(pdf_dir)
+        second_section_pdf_files.append({
+            'title': dir_titles[d],
+            'dir': d,
+            'pdf_files': pdf_files
+        })
+
+    return render(request,                  # 요청을 받으면
+                  'index.html', {           # index.html에다가 응답할건데
+                  'first_section_pdf_files': first_section_pdf_files, # first_section_pdf_files(=전자)변수를 요청하면 : 그 값으로 방금 내가 위에서 만든 리스트인 first_section_pdf_files를 할당해줘
+                  'second_section_pdf_files': second_section_pdf_files,    # second_section_pdf_files(=전자)변수를 요청하면 : 그 값으로 방금 내가 위에서 만든 리스트인 second_section_pdf_files를 할당해줘
+                    }
+        )
+
 
 
 """
@@ -160,13 +181,13 @@ def add_text_to_pdf(pdf_path, text):
         pdf_writer.write(f)
 
 def merge_pdf(request):
-    if request.method == 'POST':
+    if  request.method == 'POST':
         cover_text = request.POST['cover_text']   # cover_text라는 변수에 POST요청의 바디에서 입력값으로 들어온 cover_text를 할당
         selected_pdfs = request.POST.getlist('pdf_files') # 요청사항에 들어온 값중 pdf_files의 리스트를 변수에 저장하고
         merger = PyPDF2.PdfMerger() # PDF를 합친다?
 
         for pdf in selected_pdfs:
-            dir_name, pdf_name = pdf.split('__', 1)
+            dir_name, pdf_name = pdf.split('__', 1)    # "__" 문자열로 나눠서 변수를 저장함. 1은 뭐지? 1은 최대 분할 횟수 지정. 최대 1번만 분할됨.
             pdf_dir = os.path.join(current_dir, dir_name)
             merger.append(os.path.join(pdf_dir, pdf_name))
 

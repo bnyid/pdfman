@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>세부특강 인쇄 자동화</title>
+    <title>자료인쇄</title>
     <style>
         /* 왼쪽 여백 추가 */
         body {
@@ -28,6 +28,7 @@
             display: flex;
             justify-content: flex-start;
             align-items: center;
+            margin-bottom : 10px;
         }
         .input-container input {
             width: 30%;
@@ -38,25 +39,57 @@
             width: 100px;  /* 버튼의 가로 크기 */
             height: 35px;  /* 버튼의 세로 크기 */
         }
+        
+        .category-container {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        }
+        
+        .category-container button {
+            width: 150px;  /* 버튼의 가로 크기 */
+            height: 35px;  /* 버튼의 세로 크기 */
+            margin-right: 10px ; /* 버튼오른쪽에 여백 추가 */
+        }
+
+        .category-container button:last-child {    /* 마지막 버튼은 여백 없음처리 */
+            margin-right: 0;
+        }
+
+        .active-button {
+            background-color: #4CAF50; /* 활성화된 버튼의 배경 색상*/
+        }
+
+
+        td {
+            padding: 15px;                    
+        }
     </style>
 </head>
 <body>
     <h1>기초 5형식 특강</h1>
+
     <div class="input-container">
         <input type="text" name="cover_text" placeholder="여기에 입력하세요.">  <!-- name 속성 추가 -->
         <button type="button" id="createButton">생성하기</button>
     </div>
-    <form id="pdfForm"> <!-- form 태그는 서버쪽으로 뭔가 제출할거 있으면 요걸로 해주는거 같음-->
+
+    <div class="category-container">
+        <button type="button" id="firstSectionButton">기초 5형식</button>
+        <button type="button" id="secondSectionButton">중급 특강</button>
+    </div>
+    
+    <form id="firstPdfForm"> <!-- form 태그는 서버쪽으로 뭔가 제출할거 있으면 요걸로 해주는거 같음-->
         {% csrf_token %} <!--  양식을 제출할 때마다 서버에서 생성되는 무작위 토큰. 양식 데이터와 함께 토큰이 서버로 전송되는데,CSRF 토큰이 없거나 일치하지 않는 경우, 서버는 요청을 거부. 보안장치라고 보면됨. -->
         <table border="1">
             <tr>       <!-- 행(row)을 정의함 , 즉 첫번째 행을 의미함-->
-                {% for pdf_group in all_pdf_files %} <!-- view.py에서 전달된 all_pdf_files라는 변수를 순회하는 루프를 시작하겠다.-->
+                {% for pdf_group in first_section_pdf_files %} <!-- view.py에서 전달된 first_section_pdf_files라는 변수를 순회하는 루프를 시작하겠다.-->
                                                      <!-- 각 순회 반복에서 pdf_group이라는 변수는 all_pdf-files 컬렉션의 현재 요소를 참조함-->
-                    <th>{{ pdf_group.title }}</th>  <!-- th=테이블 헤더를 의미함, 즉 열제목에 해당하는 부분들이고, all_pdf_files 변수에서 "tilte"키에 해당하는 값을 가져와라 삽입함  -->
+                    <th>{{ pdf_group.title }}</th>  <!-- th=테이블 헤더를 의미함, 즉 열제목에 해당하는 부분들이고, first_section_pdf_files 변수에서 "tilte"키에 해당하는 값을 가져와라 삽입함  -->
                 {% endfor %}                        <!-- for 루프를 종료함-->
             </tr>
             <tr>                                    <!-- 다음 행으로 넘어가고-->
-                {% for pdf_group in all_pdf_files %}   <!-- view.py에서 정의한 all_pdf_files에 대해서 for 반복문을 수행할건데, 이 all_pdf_files에는 폴더별 열제목,폴더 이름, 폴더내의 pdf가 저장되어있음-->
+                {% for pdf_group in first_section_pdf_files %}   <!-- view.py에서 정의한 first_section_pdf_files에 대해서 for 반복문을 수행할건데, 이 first_section_pdf_files에는 폴더별 열제목,폴더 이름, 폴더내의 pdf가 저장되어있음-->
                     <td>                               <!-- 반복문의 첫번째만 언급하면, 첫 번째 폴더에 대해서 열 추가를 함  *td =table data 셀 = 열 추가-->
                         {% for pdf in pdf_group.pdf_files %}    <!-- 그 추가된 열에서 폴더 내의 각 pdf들에 대해서 반복문을 수행함 -->
                             <div>                               <!-- div로 구분해주고-->
@@ -73,12 +106,80 @@
             </tr>
         </table>
     </form>
+    
+    <!-- 두번째 섹션-->
+
+
+    <form id="secondPdfForm" style="display:none;">
+        {% csrf_token %}
+        <table border="1">
+                <tr>       <!-- 행(row)을 정의함 , 즉 첫번째 행을 의미함-->
+                    {% for pdf_group in second_section_pdf_files %} <!-- view.py에서 전달된 first_section_pdf_files라는 변수를 순회하는 루프를 시작하겠다.-->
+                                                        <!-- 각 순회 반복에서 pdf_group이라는 변수는 all_pdf-files 컬렉션의 현재 요소를 참조함-->
+                        <th>{{ pdf_group.title }}</th>  <!-- th=테이블 헤더를 의미함, 즉 열제목에 해당하는 부분들이고, first_section_pdf_files 변수에서 "tilte"키에 해당하는 값을 가져와라 삽입함  -->
+                    {% endfor %}                        <!-- for 루프를 종료함-->
+                </tr>
+                <tr>
+                    {% for pdf_group in second_section_pdf_files %}
+                    <td>
+                            {% for pdf in pdf_group.pdf_files %}
+                            <div class="pdf-group">    
+                                <div>
+                                    <input type="checkbox" id="{{ pdf_group.dir }}__{{ pdf }}" name="pdf_files" value="{{ pdf_group.dir }}__{{ pdf }}">
+                                    <label for="{{ pdf_group.dir }}__{{ pdf }}">{{ pdf }}</label>
+                                </div>
+                            
+                            {% endfor %}
+                        </div>
+                    </td>
+
+        {% endfor %}
+                </tr>
+        </table>
+    </form>
+    
+    
     <script> // script 태그는 자바스크립트 같인 클라이언트 사이드 스크립트(client-side scripts)를 정의할 때 사용함. 주로 이미지 조정, 폼(form)에 대한 검증, 콘텐츠의 동적 변경 등에 사용됨.
         document.addEventListener('DOMContentLoaded', function() {     // "전체문서(document)에 대해서 'DOMContentLaded(=html문서가 로드됨)'라는 이벤트가 발생했을 때, 다음의 함수를 수행하시오" 즉, "시작시 이 함수를 수행하시오"라는 말. -> DOM이 완전히 구성되기 전에 스크립트가 실행되면 오류가 날 수 있으니까 이걸 넣어주는거임
-            const form = document.getElementById('pdfForm'); // 문서에서 "pdfForm" 고유식별자를 가진 놈을 form이라는 상수로 선언한다.
+            const firstSectionButton = document.getElementById('firstSectionButton');
+            const secondSectionButton = document.getElementById('secondSectionButton');
+            
+            const firstPdfForm = document.getElementById('firstPdfForm');      // 문서에서 "pdfForm" 고유식별자를 가진 놈을 form이라는 상수로 선언한다.
+            const secondPdfForm = document.getElementById('secondPdfForm');
+
+        
             const createButton = document.getElementById('createButton');  // 문서에서 "createButton"이라는 고유식별자를 가진 놈을 form이라는 상수로 선언한다. = 생성하기 버튼
             const coverText = document.querySelector('input[name="cover_text"]');  // 텍스트 입력창 // querySelector는 CSS 선택자를 사용하여 HTML 문서에서 첫 번째로 일치하는 요소를 찾는 메서드임. 일치하는 요소가 없는 경우 null을 반환함.  name 속성 "cover_text"인 <input> 태그를 찾아서 상수로 선언함.
+
             
+            // 첫번 째 PDF 리스트 폼을 보여주는 함수
+            function showFirstPdfForm() {
+                firstPdfForm.style.display = 'block';
+                secondPdfForm.style.display = 'none';
+
+                firstSectionButton.classList.add('active-button');
+                secondSectionButton.classList.remove('active-button');
+                }
+            
+            // 두번 째 PDF 리스트 폼을 보여주는 함수
+            function showSecondPdfForm() {
+                firstPdfForm.style.display = 'none';
+                secondPdfForm.style.display = 'block';
+
+                firstSectionButton.classList.remove('active-button');
+                secondSectionButton.classList.add('active-button');
+
+                }
+
+            showFirstPdfForm();
+            
+
+            firstSectionButton.addEventListener('click', showFirstPdfForm); // 각 버튼에 연결 
+            secondSectionButton.addEventListener('click', showSecondPdfForm);
+            
+
+            
+
             // 동작시 체크박스를 초기화하는 함수를 만들어서, 동작이 다 끝난 뒤에 실행되게 끔 함
             function resetCheckboxes() {
                 const checkboxes = document.querySelectorAll('input[type="checkbox"]');
@@ -89,7 +190,16 @@
             
 
             createButton.addEventListener('click', function() {  // 위에서 선언한 createButton 상수에 대해서, 'click'이벤트가 일어나면 아래의 함수를 실행하시오. 
-                const formData = new FormData(form); // new = 클래스 타입의 인스턴스(객체)를 생성해라. -> FormData라는 클래스 타입의 객체를 생성하여 formData라고 할당함. -> 생성된 formData 객체는 해당 폼의 데이터를 캡슐화하며, 이후에 서버로 전송하거나 추가 데이터를 추가할 수 있습니다.
+                
+                // 현재 화면에 보이는 폼에 따라 FormData 객체 생성
+                let formData;
+                if (firstPdfForm.style.display !== 'none') {
+                    formData = new FormData(firstPdfForm);
+                } else if (secondPdfForm.style.display !== 'none') {
+                    formData = new FormData(secondPdfForm);
+                }
+
+                // 'cover_text' 값을 FormData에 추가            
                 formData.append('cover_text', coverText.value);  // 사용자가 입력한 텍스트 값(=coverText.value)을 값으로해서 'cover_text'라는 이름의 키로 formData 객체에 저장
                 const csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value; //이 코드는 클라이언트 측 JavaScript에서 서버로의 안전한 POST 요청을 수행하기 위해 필요한 CSRF 토큰을 얻는 데 사용됨. 걍 보안임.
     
