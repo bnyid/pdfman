@@ -46,53 +46,73 @@
         <input type="text" name="cover_text" placeholder="여기에 입력하세요.">  <!-- name 속성 추가 -->
         <button type="button" id="createButton">생성하기</button>
     </div>
-    <form id="pdfForm">
-        {% csrf_token %}
+    <form id="pdfForm"> <!-- form 태그는 서버쪽으로 뭔가 제출할거 있으면 요걸로 해주는거 같음-->
+        {% csrf_token %} <!--  양식을 제출할 때마다 서버에서 생성되는 무작위 토큰. 양식 데이터와 함께 토큰이 서버로 전송되는데,CSRF 토큰이 없거나 일치하지 않는 경우, 서버는 요청을 거부. 보안장치라고 보면됨. -->
         <table border="1">
-            <tr>
-                {% for pdf_group in all_pdf_files %}
-                    <th>{{ pdf_group.title }}</th>
-                {% endfor %}
+            <tr>       <!-- 행(row)을 정의함 , 즉 첫번째 행을 의미함-->
+                {% for pdf_group in all_pdf_files %} <!-- view.py에서 전달된 all_pdf_files라는 변수를 순회하는 루프를 시작하겠다.-->
+                                                     <!-- 각 순회 반복에서 pdf_group이라는 변수는 all_pdf-files 컬렉션의 현재 요소를 참조함-->
+                    <th>{{ pdf_group.title }}</th>  <!-- th=테이블 헤더를 의미함, 즉 열제목에 해당하는 부분들이고, all_pdf_files 변수에서 "tilte"키에 해당하는 값을 가져와라 삽입함  -->
+                {% endfor %}                        <!-- for 루프를 종료함-->
             </tr>
-            <tr>
-                {% for pdf_group in all_pdf_files %}
-                    <td>
-                        {% for pdf in pdf_group.pdf_files %}
-                            <div>
-                                <input type="checkbox" id="{{ pdf_group.dir }}__{{ pdf }}" name="pdf_files" value="{{ pdf_group.dir }}__{{ pdf }}">
+            <tr>                                    <!-- 다음 행으로 넘어가고-->
+                {% for pdf_group in all_pdf_files %}   <!-- view.py에서 정의한 all_pdf_files에 대해서 for 반복문을 수행할건데, 이 all_pdf_files에는 폴더별 열제목,폴더 이름, 폴더내의 pdf가 저장되어있음-->
+                    <td>                               <!-- 반복문의 첫번째만 언급하면, 첫 번째 폴더에 대해서 열 추가를 함  *td =table data 셀 = 열 추가-->
+                        {% for pdf in pdf_group.pdf_files %}    <!-- 그 추가된 열에서 폴더 내의 각 pdf들에 대해서 반복문을 수행함 -->
+                            <div>                               <!-- div로 구분해주고-->
+                                <input type="checkbox" id="{{ pdf_group.dir }}__{{ pdf }}" name="pdf_files" value="{{ pdf_group.dir }}__{{ pdf }}">   
+                                   <!-- 체크박스 타입으로, 해당 체크 박스의 고유식별자(=id)는 "해당pdf 포함된 폴더이름__pdf"으로 해주고, 데이터가 서버로 전송될 때의 이름으로는 "pdf_files"를 지정한다.
+                                        값에는 고유식별자와 동일한 이름을 준다. 이 때, 이름을 "pdf_files"라는 공통된 이름으로 해주었으므로, 사용자가 폼을 제출할 때 pdf_files 이름을 가진 체크박스들의 각기 다른 value를 모두 가져오게 된다.  
+                                        여기서 {이걸로 감싸져서 되어있는 거는 는 django 템플릿 변수를 말함-->
                                 <label for="{{ pdf }}">{{ pdf }}</label>
+                                    <!-- 체크박스의 라벨로 pdf파일들의 이름을 쓴다.-->
                             </div>
-                        {% endfor %}
+                        {% endfor %}   <!-- 이걸 각 폴더마다 해주는거임-->
                     </td>
                 {% endfor %}
             </tr>
         </table>
     </form>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('pdfForm');
-            const createButton = document.getElementById('createButton');  // 생성하기 버튼
-            const coverText = document.querySelector('input[name="cover_text"]');  // 텍스트 입력창
+    <script> // script 태그는 자바스크립트 같인 클라이언트 사이드 스크립트(client-side scripts)를 정의할 때 사용함. 주로 이미지 조정, 폼(form)에 대한 검증, 콘텐츠의 동적 변경 등에 사용됨.
+        document.addEventListener('DOMContentLoaded', function() {     // "전체문서(document)에 대해서 'DOMContentLaded(=html문서가 로드됨)'라는 이벤트가 발생했을 때, 다음의 함수를 수행하시오" 즉, "시작시 이 함수를 수행하시오"라는 말. -> DOM이 완전히 구성되기 전에 스크립트가 실행되면 오류가 날 수 있으니까 이걸 넣어주는거임
+            const form = document.getElementById('pdfForm'); // 문서에서 "pdfForm" 고유식별자를 가진 놈을 form이라는 상수로 선언한다.
+            const createButton = document.getElementById('createButton');  // 문서에서 "createButton"이라는 고유식별자를 가진 놈을 form이라는 상수로 선언한다. = 생성하기 버튼
+            const coverText = document.querySelector('input[name="cover_text"]');  // 텍스트 입력창 // querySelector는 CSS 선택자를 사용하여 HTML 문서에서 첫 번째로 일치하는 요소를 찾는 메서드임. 일치하는 요소가 없는 경우 null을 반환함.  name 속성 "cover_text"인 <input> 태그를 찾아서 상수로 선언함.
             
-            createButton.addEventListener('click', function() {  // 생성하기 버튼 클릭 이벤트
-                const formData = new FormData(form);
-                formData.append('cover_text', coverText.value);  // 텍스트 입력값을 폼 데이터에 추가
-                const csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+            createButton.addEventListener('click', function() {  // 위에서 선언한 createButton 상수에 대해서, 'click'이벤트가 일어나면 아래의 함수를 실행하시오. 
+                const formData = new FormData(form); // new = 클래스 타입의 인스턴스(객체)를 생성해라. -> FormData라는 클래스 타입의 객체를 생성하여 formData라고 할당함. -> 생성된 formData 객체는 해당 폼의 데이터를 캡슐화하며, 이후에 서버로 전송하거나 추가 데이터를 추가할 수 있습니다.
+                formData.append('cover_text', coverText.value);  // 사용자가 입력한 텍스트 값(=coverText.value)을 값으로해서 'cover_text'라는 이름의 키로 formData 객체에 저장
+                const csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value; //이 코드는 클라이언트 측 JavaScript에서 서버로의 안전한 POST 요청을 수행하기 위해 필요한 CSRF 토큰을 얻는 데 사용됨. 걍 보안임.
     
-                fetch('/merge-pdf/', {
-                    method: 'POST',
+                fetch('/merge-pdf/', {           //fetch 함수는 서버에 네트워크 요청을 보내고, 서버의 응답을 받아 처리함.   요청을 보낼 서버의 URL = '/merge-pdf/'
+                    method: 'POST',              //  HTTP 요청의 종류를 지정 : 여기서 'POST'는 데이터를 서버로 전송하는 방식 중 하나임.
                     headers: {
-                        'X-CSRFToken': csrfToken
+                        'X-CSRFToken': csrfToken // 보안 관련 코드
                     },
-                    body: formData
-                }).then(response => response.json())
-                .then(data => {
-                    if (data.pdf_url) {
-                        window.open(data.pdf_url, '_blank');
+                    body: formData                            // 전송할 데이터는 formData임, 즉, form 에서 받아온 데이터니까, 체크박스에서 온 데이터겠네.
+                }).then(response => response.json())          // fetch 요청완료-> 서버로부터 응답을 받으면 .then() 메서드가 호출됨. -> response는 서버로부터 받은 응답 객체임. response.json()는 응답 본문을 JSON 형식으로 변환하는 메서드 : 이 코드는 응답을 JSON으로 변환하는 작업을 비동기적으로 수행한다고 볼 수 있음.
+                .then(data => {                               // JSON으로 변환된 응답 데이터를 처리합니다. 여기서 data는 JSON 객체로 변환된 응답 데이터입니다.
+                    if (data.pdf_url) {                       // if (data.pdf_url) { ... }: 이 조건문은 data 객체 내에 pdf_url 속성이 존재하고, 그 값이 참이면
+                        window.open(data.pdf_url, '_blank');  // 이 URL(=병합된 PDF)을 연다. 이 때 'blank'는 새 탭이나 창에서 링크를 열도록 함
                     }
                 });
             });
         });
+
+
+/*
+[개념 정리]
+
+'POST' 요청이란?
+전송해야될 데이터를 HTTP 메세지의 Body에 담아서 전송합니다. 
+HTTP 메세지의 Body는 길이의 제한없이 데이터를 전송할 수 있어서, GET과 달리 대용량 데이터를 전송할 수 있음.
+데이터가 Body로 전송되고 내용이 눈에 보이지 않아 GET보다 보안적인 면에서 안전하다고 생각할 수 있지만,
+크롬 개발자 도구, Fiddler와 같은 툴로 요청 내용을 확인할 수 있기 때문에 민감한 데이터의 경우에는 반드시 암호화해 전송해야 함
+POST 요청을 할 때, 특히 요청 본문에 JSON 데이터나 파일 등이 포함되어 있을 경우 Content-Type 헤더를 적절하게 설정해야 서버가 요청을 올바르게 해석하고 처리할 수 있으나,
+그게 아니라면 일반적으로 명시하지 않아도 괜찮다
+
+*/
+
     </script>
 </body>
 </html>
