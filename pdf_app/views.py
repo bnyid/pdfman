@@ -208,15 +208,7 @@ for 루프와 조건문을 사용하여 새로운 리스트를 만드는 표현�
              squares = [n ** 2 for n in numbers] = [1,4,9,16,25]
              even_squares = [n ** 2 for n in numbers if n % 2 == 0] = [4,16]
 
-        
-
-
-
-
-
-
 
 
 """
 
-# 이렇게 수정하면, 'Lesson_PDFs' 폴더를 프로젝트의 views.py와 같은 위치에 두면 됩니다.
