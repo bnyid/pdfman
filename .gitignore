@@ -1,4 +1,5 @@
 pdf_app/merged.pdf
+__pycache__/
 *.pyc
 
 
