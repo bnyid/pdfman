@@ -82,7 +82,7 @@ dir_titles = {
 
     "2_01_spartan" : "스파르탄",
     "2_02_advanced_lecture" : "중급 특강",
-    "2_03_third_class" : "3" ,
+    "2_03_third_class" : "기타" ,
     "2_04_fourth_class" : "4",
 }
 
