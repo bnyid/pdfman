@@ -67,7 +67,7 @@ registerFont() = 새로운 폰트를 ReportLab의 폰트 시스템에 등록함 
 # 리스트(list)와 배열(array)은 같은말임
 
 first_section_dirs_names = ["1_01_preview", "1_02_preview_test", "1_03_preview_test_solution", "1_04_lesson", "1_05_review_test", "1_06_review_test_solution", "1_07_bsr_test", "1_08_bsr_test_solution"]
-second_section_dirs_names = ["2_01_spartan", "2_02_advanced_lecture", "2_03_third_class", "2_04_fourth_class"]
+second_section_dirs_names = ["2_01_spartan", "2_02_advanced_lecture", "2_03_third_class", "2_04_fourth_class", "2_05_fifth_class"]
 
 # 각 폴더 이름(키=key) 에 제목열에 들어갈 텍스트(값:value)를 딕셔너리로 선언함
 dir_titles = {             
@@ -82,8 +82,9 @@ dir_titles = {
 
     "2_01_spartan" : "스파르탄",
     "2_02_advanced_lecture" : "중급 특강",
-    "2_03_third_class" : "기타" ,
-    "2_04_fourth_class" : "4",
+    "2_03_third_class" : "개념 리마인드" ,
+    "2_04_fourth_class" : "특강 어휘",
+    "2_05_fifth_class" : "기타 문서",
 }
 
 
