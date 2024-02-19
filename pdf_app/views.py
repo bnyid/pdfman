@@ -213,7 +213,8 @@ def serve_pdf(request):
 
 def get_pdf_list(pdf_dir): # 특정 경로를 매개변수로 받아서
     pdf_files = [f for f in os.listdir(pdf_dir) if f.endswith('.pdf')]  # 해당 경로의 모든 파일들의 이름 리스트중,  ".pdf" 로 끝나는 파일들의 이름들로 구성된 리스트를 선언함
-    sorted_pdf_files = sorted(pdf_files)  # 오름차순으로 정렬해서 변수 리스트로 할당함
+    sorted_pdf_files = sorted([os.path.splitext(f)[0] for f in pdf_files])  # 오름차순으로 정렬해서 변수 리스트로 할당함
+    #sorted_pdf_files = sorted(pdf_files)  # 오름차순으로 정렬해서 변수 리스트로 할당함
     return sorted_pdf_files  # 그 변수를 반환함
 
 """
