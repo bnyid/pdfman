@@ -188,7 +188,7 @@
                 });
             }
             
-
+            /* 2/20(화) 11am
             createButton.addEventListener('click', function() {  // 위에서 선언한 createButton 상수에 대해서, 'click'이벤트가 일어나면 아래의 함수를 실행하시오. 
                 
                 // 현재 화면에 보이는 폼에 따라 FormData 객체 생성
@@ -217,7 +217,37 @@
                     resetCheckboxes(); // 체크박스를 모두 초기화함
                 });
             });
+        */
 
+        createButton.addEventListener('click', function() {
+            let formData = new FormData();
+            const currentForm = firstPdfForm.style.display !== 'none' ? firstPdfForm : secondPdfForm;
+            const checkboxes = currentForm.querySelectorAll('input[name="pdf_files"]:checked');
+            
+            checkboxes.forEach(checkbox => {
+                // 확장자 .pdf를 파일 이름에 추가
+                const pdfValue = checkbox.value + '.pdf'; // 확장자 추가
+                formData.append('pdf_files', pdfValue);
+            });
+
+            formData.append('cover_text', coverText.value);
+            const csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+
+            fetch('/merge-pdf/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.pdf_url) {
+                    window.open(data.pdf_url, '_blank');
+                }
+                resetCheckboxes();
+            });
+        });
 
         });
 
